@@ -12,7 +12,8 @@ const StartupProgress: React.FC = () => {
   const [phases, setPhases] = useState<PhaseProps[]>(
     initialProgress || phasesData
   );
-
+  const [randomFact, setRandomFact] = useState<string>("");
+  const [allPhasesCompleted, setAllPhasesCompleted] = useState<boolean>(false);
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(phases));
   }, [phases]);
@@ -35,8 +36,6 @@ const StartupProgress: React.FC = () => {
         task.isDisabled = true;
       });
     }
-    updatedPhases.map((phase) => console.log("complete: ", phase));
-
     setPhases(updatedPhases);
   };
 
@@ -53,8 +52,8 @@ const StartupProgress: React.FC = () => {
         task.isDisabled = false;
       });
     }
-    updatedPhases.map((phase) => console.log("reopen: ", phase));
     setPhases(updatedPhases);
+    setAllPhasesCompleted(false);
   }
 
   function handlePhaseComplete(phaseIndex: number) {
@@ -70,10 +69,27 @@ const StartupProgress: React.FC = () => {
         updatedPhases[phaseIndex].isPhaseCompleted = false;
       }
     }
+    const isAllPhasesCompleted = updatedPhases.every(
+      (phase) => phase.isPhaseCompleted
+    );
+    setAllPhasesCompleted(isAllPhasesCompleted);
 
     setPhases(updatedPhases);
   }
 
+  useEffect(() => {
+    if (allPhasesCompleted) {
+      // Fetch a random fact when all phases are completed
+      fetch("https://uselessfacts.jsph.pl/api/v2/facts/random")
+        .then((response) => response.json())
+        .then((data) => {
+          setRandomFact(data.text);
+        })
+        .catch((error) => {
+          console.error("Error fetching random fact:", error);
+        });
+    }
+  }, [allPhasesCompleted]);
   return (
     <div
       style={{
@@ -99,6 +115,16 @@ const StartupProgress: React.FC = () => {
           isPhaseCompleted={phase.isPhaseCompleted}
         />
       ))}
+      <hr />
+      <p
+        style={{
+          maxHeight: allPhasesCompleted ? "300px" : "0px",
+          transition: "max-height 0.5s ease-in-out",
+          overflow: "hidden",
+        }}
+      >
+        {randomFact}
+      </p>
     </div>
   );
 };
