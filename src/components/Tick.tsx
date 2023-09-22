@@ -1,8 +1,5 @@
 import React, { useEffect, useRef } from "react";
-
-interface TickProps {
-  isPhaseCompletes: boolean;
-}
+import { TickProps } from "../helpers/types";
 
 const Tick: React.FC<TickProps> = ({ isPhaseCompletes }) => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -21,7 +18,6 @@ const Tick: React.FC<TickProps> = ({ isPhaseCompletes }) => {
     path.style.strokeDasharray = length.toString();
     path.style.strokeDashoffset = length.toString();
 
-    // Trigger a reflow to apply initial styles
     svg.getBoundingClientRect();
 
     // If isPhaseCompletes is true, start the animation
@@ -42,11 +38,8 @@ const Tick: React.FC<TickProps> = ({ isPhaseCompletes }) => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 469.184 469.185"
       style={{
-        width: "75px",
-        height: "75px",
-        position: "absolute",
-        top: "0",
-        right: "0",
+        width: "50px",
+        height: "50px",
         fill: "transparent",
       }}
       ref={svgRef}

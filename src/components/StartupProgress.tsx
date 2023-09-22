@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Phase from "./Phase";
-import { PhaseProps } from "../types";
-import { phasesData } from "../data";
+import { PhaseProps } from "../helpers/types";
+import { phasesData } from "../helpers/data";
 
 const STORAGE_KEY = "startup-progress";
 
@@ -26,16 +26,34 @@ const StartupProgress: React.FC = () => {
     return phases[phaseIndex - 1].isPhaseCompleted;
   }
 
-  function handleTaskComplete(phaseIndex: number, taskIndex: number) {
+  const handleTaskComplete = (phaseIndex: number, taskIndex: number) => {
     const updatedPhases = [...phases];
     updatedPhases[phaseIndex].tasks[taskIndex].isCompleted = true;
+    // Disable checkboxes for previous phase tasks if any task in the current phase is checked
+    if (phaseIndex > 0) {
+      updatedPhases[phaseIndex - 1].tasks.forEach((task) => {
+        task.isDisabled = true;
+      });
+    }
+    updatedPhases.map((phase) => console.log("complete: ", phase));
+
     setPhases(updatedPhases);
-  }
+  };
 
   function handleTaskReopen(phaseIndex: number, taskIndex: number) {
     const updatedPhases = [...phases];
     updatedPhases[phaseIndex].tasks[taskIndex].isCompleted = false;
     updatedPhases[phaseIndex].isPhaseCompleted = false;
+
+    const allTasksCompleted = updatedPhases[phaseIndex].tasks.every(
+      (task) => task.isCompleted === false
+    );
+    if (phaseIndex > 0 && allTasksCompleted) {
+      updatedPhases[phaseIndex - 1].tasks.forEach((task) => {
+        task.isDisabled = false;
+      });
+    }
+    updatedPhases.map((phase) => console.log("reopen: ", phase));
     setPhases(updatedPhases);
   }
 
@@ -59,7 +77,8 @@ const StartupProgress: React.FC = () => {
   return (
     <div
       style={{
-        width: "40%",
+        maxWidth: "300px",
+        width: "100%",
         background: "#ffffff",
         borderRadius: "3px",
         boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.1)",

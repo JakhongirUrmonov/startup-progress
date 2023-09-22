@@ -1,12 +1,5 @@
 import React from "react";
-
-interface TaskProps {
-  title: string;
-  isCompleted: boolean;
-  isDisabled: boolean; // Add a prop to disable the task completion
-  onComplete: () => void;
-  onReopen: () => void;
-}
+import { TaskProps } from "../helpers/types";
 
 const Task: React.FC<TaskProps> = ({
   title,
@@ -16,7 +9,13 @@ const Task: React.FC<TaskProps> = ({
   onReopen,
 }) => {
   return (
-    <label style={{ display: "block", margin: "8px 0px" }}>
+    <label
+      style={{
+        display: "block",
+        margin: "8px 0px",
+        cursor: isDisabled ? "default" : "pointer",
+      }}
+    >
       <input
         type="checkbox"
         checked={isCompleted}
